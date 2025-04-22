@@ -21,7 +21,7 @@ def custom_exception_handler(exc, context):
     if response is None:
         logger.error(traceback.format_exc())
         error_message = str(exc) if IS_DEBUG_ON else "Please contact the system administrator."
-        return JsonResponse(error_message, status=500)
+        return JsonResponse({"error": error_message}, status=500)
 
     error_message = response.data["detail"] if "detail" in response.data else response.data
-    return JsonResponse(error_message, status=response.status_code)
+    return JsonResponse({"error": error_message}, status=response.status_code)
