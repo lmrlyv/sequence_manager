@@ -4,31 +4,37 @@ from django.http import JsonResponse
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
+from sequence_manager.fibonacci.serializers import FibonacciNumberSerializer
+from sequence_manager.fibonacci.services import FibonacciSequenceService
+
 
 logger = logging.getLogger(__name__)
 
 
-class FibonacciValueView(APIView):
+class FibonacciNumberView(APIView):
 
     def get(self, request: Request, number: int, *args, **kwargs):
-        return JsonResponse({"number": 6, "value": 5})
+        serializer = FibonacciNumberSerializer(data={"number": number})
+
+        if not serializer.is_valid():
+            return JsonResponse({"error": serializer.errors}, status=400)
+
+        fib_num = FibonacciSequenceService().get_fib_number(number - 1)
+        return JsonResponse({"number": number, "value": fib_num})
 
 
-class FibonacciListView(APIView):
+class FibonacciNumberListView(APIView):
 
-    def get(self, request: Request, *args, **kwargs):
-        return JsonResponse(
-            {
-                "data": [
-                    {"number": 1, "value": 0},
-                    {"number": 2, "value": 1},
-                    {"number": 3, "value": 1},
-                    {"number": 4, "value": 2},
-                    {"number": 5, "value": 3},
-                    {"number": 6, "value": 5},
-                ]
-            }
-        )
+    def get(self, request: Request, number: int, *args, **kwargs):
+        serializer = FibonacciNumberSerializer(data={"number": number})
+
+        if not serializer.is_valid():
+            return JsonResponse({"error": serializer.errors}, status=400)
+
+        fib_nums = FibonacciSequenceService().get_all_fib_numbers(number - 1)
+        response_data = [{"number": idx + 1, "value": num} for idx, num in enumerate(fib_nums)]
+
+        return JsonResponse(response_data, safe=False)
 
 
 class BlacklistNumberView(APIView):
