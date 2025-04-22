@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 
 from sequence_manager.fibonacci.serializers import FibonacciNumberSerializer
 from sequence_manager.fibonacci.services import FibonacciSequenceService
+from sequence_manager.fibonacci.utils.paginators import FibonacciNumberPagination
 
 
 logger = logging.getLogger(__name__)
@@ -34,7 +35,8 @@ class FibonacciNumberListView(APIView):
         fib_nums = FibonacciSequenceService().get_all_fib_numbers(number - 1)
         response_data = [{"number": idx + 1, "value": num} for idx, num in enumerate(fib_nums)]
 
-        return JsonResponse(response_data, safe=False)
+        paginator = FibonacciNumberPagination()
+        return paginator.paginate(response_data, request)
 
 
 class BlacklistNumberView(APIView):
