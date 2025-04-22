@@ -5,10 +5,7 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from sequence_manager.fibonacci.serializers import FibonacciNumberSerializer
-from sequence_manager.fibonacci.services import (
-    BlacklistFibonacciNumberService,
-    FibonacciSequenceService,
-)
+from sequence_manager.fibonacci.services import BlacklistService, FibonacciSequenceService
 from sequence_manager.fibonacci.utils.paginators import FibonacciNumberPagination
 
 
@@ -22,6 +19,11 @@ class FibonacciNumberView(APIView):
 
         if not serializer.is_valid():
             return JsonResponse({"error": serializer.errors}, status=400)
+
+        if BlacklistService().is_blacklisted(number):
+            return JsonResponse(
+                {"error": "This number is blacklisted and cannot be used."}, status=403
+            )
 
         fib_num = FibonacciSequenceService().get_fib_number(number - 1)
         return JsonResponse({"number": number, "value": fib_num})
@@ -49,7 +51,7 @@ class BlacklistNumberView(APIView):
         if not serializer.is_valid():
             return JsonResponse({"error": serializer.errors}, status=400)
 
-        BlacklistFibonacciNumberService().add_to_blacklist(number)
+        BlacklistService().add_to_blacklist(number)
 
         return JsonResponse(
             f"Number {number} has been added to the blacklist!", status=201, safe=False
@@ -61,6 +63,6 @@ class BlacklistNumberView(APIView):
         if not serializer.is_valid():
             return JsonResponse({"error": serializer.errors}, status=400)
 
-        BlacklistFibonacciNumberService().remove_from_blacklist(number)
+        BlacklistService().remove_from_blacklist(number)
 
         return JsonResponse(f"Number {number} has been deleted from the blacklist!", safe=False)

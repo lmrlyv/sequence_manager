@@ -8,7 +8,7 @@ from sequence_manager.fibonacci.views import (
 
 
 urlpatterns = [
-    path("api/v1/fibonacci/<int:number>/", FibonacciNumberView.as_view(), name="fibonacci-value"),
+    path("api/v1/fibonacci/<int:number>/", FibonacciNumberView.as_view(), name="fibonacci-number"),
     path(
         "api/v1/fibonacci/<int:number>/all/",
         FibonacciNumberListView.as_view(),

@@ -1,5 +1,4 @@
 from django.db import IntegrityError
-from rest_framework.exceptions import APIException
 
 from sequence_manager.fibonacci.models import BlacklistedFibonacciNumber
 from sequence_manager.fibonacci.utils.api_exceptions import (
@@ -58,13 +57,8 @@ class FibonacciSequenceService:
         return fibs
 
 
-class BlacklistFibonacciNumberService:
-    """Service for managing blacklisted Fibonacci numbers.
-
-    Provides methods to add and remove Fibonacci numbers from a blacklist.
-    Handles validation and raises appropriate API exceptions for duplicate
-    or missing entries.
-    """
+class BlacklistService:
+    """Service for managing blacklisted Fibonacci numbers."""
 
     def add_to_blacklist(self, number: int):
         """Adds a Fibonacci number to the blacklist.
@@ -81,8 +75,6 @@ class BlacklistFibonacciNumberService:
         except IntegrityError:
             # Handle the case where there is a constraint violation (e.g. uniqueness)
             raise BlacklistConflictApiException()
-        except Exception as err:
-            raise APIException(detail=f"Unexpected error: {err}")
 
     def remove_from_blacklist(self, number: int):
         """Removes a Fibonacci number from the blacklist.
@@ -99,5 +91,14 @@ class BlacklistFibonacciNumberService:
             obj.delete()
         except BlacklistedFibonacciNumber.DoesNotExist:
             raise BlacklistNotFoundApiException()
-        except Exception as err:
-            raise APIException(detail=f"Unexpected error: {err}")
+
+    def is_blacklisted(self, number: int) -> bool:
+        """Checks whether a given Fibonacci number is blacklisted.
+
+        Args:
+            number (int): The Fibonacci number to check.
+
+        Returns:
+            bool: True if the number is blacklisted, False otherwise.
+        """
+        return BlacklistedFibonacciNumber.objects.filter(number=number).exists()
