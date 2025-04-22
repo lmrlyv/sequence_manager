@@ -1,0 +1,15 @@
+{
+    "python.defaultInterpreterPath": ".venv/bin/python",
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": ".*\\.py$",
+                "cmd": ".venv/bin/python -m black ${file}"
+            },
+            {
+                "match": ".*\\.py$",
+                "cmd": ".venv/bin/python -m isort ${file}"
+            }
+        ]
+    }
+}

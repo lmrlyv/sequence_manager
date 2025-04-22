@@ -1,0 +1,50 @@
+x-django-app-env: &django-app-env-block
+  environment: &django-app-env-objects
+    DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+    DB_HOST: ${DB_HOST}
+    DB_PORT: ${DB_PORT}
+    DB_NAME: ${DB_NAME}
+    DB_USER: ${DB_USER}
+    DB_PASSWORD: ${DB_PASSWORD}
+
+services:
+  web:
+    build:
+      context: .
+      args:
+        - ENVIRONMENT=dev
+    image: django_web:dev
+    container_name: web
+    command: >
+      bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    <<: *django-app-env-block
+    volumes:
+      - .:/sequence_manager
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.4
+    container_name: mysql
+    ports:
+      - "${DB_PORT}:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-test}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init_scripts/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      retries: 10
+      timeout: 5s
+      start_period: 10s
+
+volumes:
+  db_data:
