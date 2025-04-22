@@ -1,3 +1,13 @@
+from django.db import IntegrityError
+from rest_framework.exceptions import APIException
+
+from sequence_manager.fibonacci.models import BlacklistedFibonacciNumber
+from sequence_manager.fibonacci.utils.api_exceptions import (
+    BlacklistConflictApiException,
+    BlacklistNotFoundApiException,
+)
+
+
 class FibonacciSequenceService:
     """Service class for calculating Fibonacci numbers."""
 
@@ -46,3 +56,48 @@ class FibonacciSequenceService:
         for _ in range(2, index + 1):
             fibs.append(fibs[-1] + fibs[-2])
         return fibs
+
+
+class BlacklistFibonacciNumberService:
+    """Service for managing blacklisted Fibonacci numbers.
+
+    Provides methods to add and remove Fibonacci numbers from a blacklist.
+    Handles validation and raises appropriate API exceptions for duplicate
+    or missing entries.
+    """
+
+    def add_to_blacklist(self, number: int):
+        """Adds a Fibonacci number to the blacklist.
+
+        Args:
+            number (int): The Fibonacci number to blacklist.
+
+        Raises:
+            BlacklistConflictApiException: If the number is already blacklisted.
+            APIException: For any unexpected errors during the operation.
+        """
+        try:
+            BlacklistedFibonacciNumber.objects.create(number=number)
+        except IntegrityError:
+            # Handle the case where there is a constraint violation (e.g. uniqueness)
+            raise BlacklistConflictApiException()
+        except Exception as err:
+            raise APIException(detail=f"Unexpected error: {err}")
+
+    def remove_from_blacklist(self, number: int):
+        """Removes a Fibonacci number from the blacklist.
+
+        Args:
+            number (int): The Fibonacci number to remove.
+
+        Raises:
+            BlacklistNotFoundApiException: If the number is not found in the blacklist.
+            APIException: For any unexpected errors during the operation.
+        """
+        try:
+            obj = BlacklistedFibonacciNumber.objects.get(number=number)
+            obj.delete()
+        except BlacklistedFibonacciNumber.DoesNotExist:
+            raise BlacklistNotFoundApiException()
+        except Exception as err:
+            raise APIException(detail=f"Unexpected error: {err}")
