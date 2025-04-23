@@ -193,6 +193,47 @@ class BlacklistNumberView(APIView):
         return JsonResponseSuccess(f"Number {number} has been added to the blacklist!", status=201)
 
     def delete(self, request, number, *args, **kwargs):
+        """Remove a Fibonacci number from the blacklist.
+
+        DELETE /api/v1/fibonacci/blacklist/<number>/
+
+        Description:
+            This endpoint removes the specified Fibonacci number from the blacklist, allowing it
+            to appear in future Fibonacci sequence responses.
+
+        Parameters:
+            number (int): The Fibonacci number to remove. Must be a positive integer.
+
+        Responses:
+            200 OK:
+                Description: The number was successfully removed from the blacklist.
+                Example:
+                {
+                    "success": true,
+                    "message": "Number 13 has been deleted from the blacklist!"
+                }
+
+            400 Bad Request:
+                Description: The input number is invalid (e.g., not greater than 1).
+                Example:
+                {
+                    "success": false,
+                    "error": {
+                        "number": [
+                            "Ensure this value is greater than or equal to 1."
+                        ]
+                    },
+                    "message": "Validation error"
+                }
+
+            404 Not Found:
+                Description: The number was not found in the blacklist.
+                Example:
+                {
+                    "success": false,
+                    "error": "This number is not found in the blacklist."
+                }
+        """
         serializer = FibonacciNumberSerializer(data={"number": number})
 
         if not serializer.is_valid():
