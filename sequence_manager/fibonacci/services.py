@@ -102,3 +102,11 @@ class BlacklistService:
             bool: True if the number is blacklisted, False otherwise.
         """
         return BlacklistedFibonacciNumber.objects.filter(number=number).exists()
+
+    def get_blacklisted_numbers(self) -> list[int]:
+        """Retrieves all blacklisted Fibonacci numbers in a set.
+
+        Returns:
+            set[int]: A set of all blacklisted Fibonacci numbers.
+        """
+        return set(BlacklistedFibonacciNumber.objects.values_list("number", flat=True))

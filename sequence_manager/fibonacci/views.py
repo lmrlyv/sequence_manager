@@ -38,7 +38,14 @@ class FibonacciNumberListView(APIView):
             return JsonResponse({"error": serializer.errors}, status=400)
 
         fib_nums = FibonacciSequenceService().get_all_fib_numbers(number - 1)
-        response_data = [{"number": idx + 1, "value": num} for idx, num in enumerate(fib_nums)]
+
+        blacklisted_numbers = BlacklistService().get_blacklisted_numbers()
+
+        response_data = [
+            {"number": idx + 1, "value": num}
+            for idx, num in enumerate(fib_nums)
+            if (idx + 1) not in blacklisted_numbers
+        ]
 
         paginator = FibonacciNumberPagination()
         return paginator.paginate(response_data, request)
