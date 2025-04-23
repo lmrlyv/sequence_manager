@@ -23,6 +23,6 @@ def custom_exception_handler(exc, context):
         error_message = str(exc) if IS_DEBUG_ON else "Please contact the system administrator."
         return JsonResponseError(error_message, message="Unknown error", status=500)
 
-    message = response.data.get("code", "")
+    message = response.data.get("code")
     error_message = response.data["detail"] if "detail" in response.data else response.data
     return JsonResponseError(error_message, message=message, status=response.status_code)
