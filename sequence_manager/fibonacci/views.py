@@ -190,7 +190,10 @@ class BlacklistNumberView(APIView):
 
         BlacklistService().add_to_blacklist(number)
 
-        return JsonResponseSuccess(f"Number {number} has been added to the blacklist!", status=201)
+        success_message = f"Number {number} has been added to the blacklist!"
+        logger.info(success_message)
+
+        return JsonResponseSuccess(success_message, status=201)
 
     def delete(self, request, number, *args, **kwargs):
         """Remove a Fibonacci number from the blacklist.
@@ -241,4 +244,7 @@ class BlacklistNumberView(APIView):
 
         BlacklistService().remove_from_blacklist(number)
 
-        return JsonResponseSuccess(f"Number {number} has been deleted from the blacklist!")
+        success_message = f"Number {number} has been deleted from the blacklist!"
+        logger.info(success_message)
+
+        return JsonResponseSuccess(success_message)

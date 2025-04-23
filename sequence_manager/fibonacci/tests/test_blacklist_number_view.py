@@ -1,3 +1,5 @@
+import logging
+
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -8,6 +10,10 @@ class BlacklistNumberViewPostMethodTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
+        logging.disable(logging.CRITICAL)
+
+    def tearDown(self):
+        logging.disable(logging.NOTSET)
 
     def test_blacklist_fib_number_success(self):
         """Test adding fibonacci number into the blacklist for a valid input."""
@@ -47,6 +53,10 @@ class BlacklistNumberViewDeleteMethodTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
+        logging.disable(logging.CRITICAL)
+
+    def tearDown(self):
+        logging.disable(logging.NOTSET)
 
     def test_removing_blacklisted_fib_number_success(self):
         """Test removing blacklisted fibonacci number for a valid input."""

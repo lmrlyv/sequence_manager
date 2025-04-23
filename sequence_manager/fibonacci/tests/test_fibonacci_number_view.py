@@ -1,3 +1,5 @@
+import logging
+
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -8,6 +10,10 @@ class FibonacciNumberViewTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
+        logging.disable(logging.CRITICAL)
+
+    def tearDown(self):
+        logging.disable(logging.NOTSET)
 
     def test_get_fib_number_success(self):
         """Test getting fibonacci number for a valid input."""
