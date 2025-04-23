@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from sequence_manager.fibonacci.serializers import FibonacciNumberSerializer
 from sequence_manager.fibonacci.services import BlacklistService, FibonacciSequenceService
 from sequence_manager.fibonacci.utils.paginators import FibonacciNumberPagination
+from sequence_manager.utils.custom_responses import JsonResponseError, JsonResponseSuccess
 
 
 logger = logging.getLogger(__name__)
@@ -18,15 +19,13 @@ class FibonacciNumberView(APIView):
         serializer = FibonacciNumberSerializer(data={"number": number})
 
         if not serializer.is_valid():
-            return JsonResponse({"error": serializer.errors}, status=400)
+            return JsonResponseError(serializer.errors, message="Validation error", status=400)
 
         if BlacklistService().is_blacklisted(number):
-            return JsonResponse(
-                {"error": "This number is blacklisted and cannot be used."}, status=403
-            )
+            return JsonResponseError("This number is blacklisted and cannot be used.", status=403)
 
         fib_num = FibonacciSequenceService().get_fib_number(number - 1)
-        return JsonResponse({"number": number, "value": fib_num})
+        return JsonResponseSuccess({"number": number, "value": fib_num})
 
 
 class FibonacciNumberListView(APIView):
@@ -35,7 +34,7 @@ class FibonacciNumberListView(APIView):
         serializer = FibonacciNumberSerializer(data={"number": number})
 
         if not serializer.is_valid():
-            return JsonResponse({"error": serializer.errors}, status=400)
+            return JsonResponseError(serializer.errors, message="Validation error", status=400)
 
         fib_nums = FibonacciSequenceService().get_all_fib_numbers(number - 1)
 
@@ -56,20 +55,18 @@ class BlacklistNumberView(APIView):
         serializer = FibonacciNumberSerializer(data={"number": number})
 
         if not serializer.is_valid():
-            return JsonResponse({"error": serializer.errors}, status=400)
+            return JsonResponseError(serializer.errors, message="Validation error", status=400)
 
         BlacklistService().add_to_blacklist(number)
 
-        return JsonResponse(
-            f"Number {number} has been added to the blacklist!", status=201, safe=False
-        )
+        return JsonResponseSuccess(f"Number {number} has been added to the blacklist!", status=201)
 
     def delete(self, request, number, *args, **kwargs):
         serializer = FibonacciNumberSerializer(data={"number": number})
 
         if not serializer.is_valid():
-            return JsonResponse({"error": serializer.errors}, status=400)
+            return JsonResponseError(serializer.errors, message="Validation error", status=400)
 
         BlacklistService().remove_from_blacklist(number)
 
-        return JsonResponse(f"Number {number} has been deleted from the blacklist!", safe=False)
+        return JsonResponseSuccess(f"Number {number} has been deleted from the blacklist!")
