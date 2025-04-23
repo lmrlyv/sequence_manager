@@ -49,3 +49,12 @@ A total of 16 tests have been implemented. To run them, use the following comman
 ```sh
 docker-compose exec -it web python manage.py test
 ```
+
+## API Endpoints Summary
+
+| Method | Endpoint                                | Description                                                      |
+|--------|-----------------------------------------|------------------------------------------------------------------|
+| GET    | `/api/v1/fibonacci/<number>/`           | Get the Fibonacci number at the specified index.                 |
+| GET    | `/api/v1/fibonacci/list/<number>/`      | Get a paginated list of Fibonacci numbers up to the given number.|
+| POST   | `/api/v1/fibonacci/blacklist/<number>/` | Add a Fibonacci number to the blacklist.                         |
+| DELETE | `/api/v1/fibonacci/blacklist/<number>/` | Remove a Fibonacci number from the blacklist.                    |
